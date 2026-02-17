@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kenangan Kita</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(45deg, #ff9a9e, #fecfef, #fad0c4);
+            background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y="50%" font-size="50" fill="rgba(255,255,255,0.3)">❤️</text></svg>');
+            background-size: 50px 50px;
+            color: #333;
+            text-align: center;
+            padding: 20px;
+            margin: 0;
+            overflow: hidden;
+        }
+        h1 {
+            color: #d63384;
+            font-size: 2.5em;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            position: relative;
+            z-index: 1;
+        }
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 10px;
+            margin: 20px 0;
+        }
+        .photo-container {
+            position: relative;
+            display: inline-block;
+            animation: fadeIn 0.5s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        .caption {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 5px;
+            text-align: center;
+        }
+        .delete-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background-color: rgba(255, 0, 0, 0.7);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .delete-btn:hover {
+            background-color: rgba(255, 0, 0, 1);
+        }
+        .slideshow {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 10;
+            justify-content: center;
+            align-items: center;
+        }
+        .slideshow img {
+            max-width: 80%;
+            max-height: 80%;
+            border-radius: 10px;
+        }
+        .slideshow .caption {
+            color: white;
+            margin-top: 10px;
+        }
+        .close-slideshow {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #d63384;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .calendar-section {
+            margin: 20px 0;
+        }
+        .calendar-section input, .calendar-section textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin: 5px 0;
+        }
+        .timeline {
+            list-style: none;
+            padding: 0;
+        }
+        .timeline li {
+            background: #f9f9f9;
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+            border-left: 5px solid #d63384;
+        }
+        .music-section {
+            margin: 20px 0;
+        }
+        .music-section input {
+            width: 70%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-right: 10px;
+        }
+        .music-player {
+            margin-top: 10px;
+        }
+        button {
+            background-color: #d63384;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1em;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px 0;
+        }
+        button:hover {
+            background-color: #b02a6a;
+        }
+        .logout-btn {
+            background-color: #6c757d;
+            margin-left: 10px;
+        }
+        .logout-btn:hover {
+            background-color: #5a6268;
+        }
+        p {
+            font-size: 1.2em;
+            line-height: 1.6;
+        }
+        input[type="file"] {
+            display: none;
+        }
+        .hidden {
+            display: none;
+        }
+        /* Efek hati jatuh */
+        .heart {
+            position: absolute;
+            top: -10px;
+            font-size: 20px;
+            color: #ff6b9d;
+            animation: fall 5s linear infinite;
+            z-index: 0;
+        }
+        @keyframes fall {
+            to {
+                transform: translateY(100vh);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Efek hati jatuh -->
+    <div id="hearts"></div>
+
+    <div id="loginPrompt" class="container">
+        <h1>Login untuk Akses Kenangan Kita</h1>
+        <p>Hanya untuk 2 pengguna terpilih. Masukkan password:</p>
+        <input type="password" id="passwordInput" placeholder="Password">
+        <button onclick="checkPassword()">Masuk</button>
+        <p id="errorMsg" style="color: red; display: none;">Password salah! Coba lagi.</p>
+    </div>
+
+    <div id="mainContent" class="hidden">
+        <div class="container">
+            <h1>Kenangan Nadin dan Rafa <button class="logout-btn" onclick="logout()">Logout</button></h1>
+            
+            <!-- Section Kalender Kenangan -->
+            <div class="calendar-section">
+                <h2>Kalender Kenangan</h2>
+                <input type="date" id="eventDate" placeholder="Pilih tanggal">
+                <textarea id="eventDesc" placeholder="Deskripsi kenangan (misal: Ulang tahun jadian kita)"></textarea>
+                <button onclick="addEvent()">Tambah Event</button>
+                <ul class="timeline" id="timeline">
+                    <!-- Event akan ditambahkan di sini -->
+                </ul>
+            </div>
+            
+            <!-- Section Musik -->
+            <div class="music-section">
+                <h2>Musik Latar</h2>
+                <input type="text" id="musicLink" placeholder="Paste link YouTube atau Spotify di sini">
+                <button onclick="updateMusic()">Update Musik</button>
+                <div class="music-player" id="musicPlayer">
+                    <!-- Player musik akan muncul di sini -->
+                </div>
+            </div>
+            
+            <button onclick="document.getElementById('fileInput').click();">Tambah Foto</button>
+            <button onclick="startSlideshow()">Mulai Slideshow</button>
+            <input type="file" id="fileInput" accept="image/*" multiple>
+            <div class="gallery" id="gallery">
+                <!-- Foto akan ditambahkan di sini -->
+            </div>
+            <p>Setiap momen bersamamu adalah cerita yang tak pernah ingin aku lupakan. Dari senyummu yang selalu membuat hariku lebih cerah, hingga cara kita tertawa bersama di malam yang tenang.</p>
+            <p>Aku bersyukur memiliki seseorang seperti kamu, yang membuat hidupku terasa lengkap. Terima kasih telah menjadi bagian dari perjalanan ini.</p>
+            <p>Dengan cinta yang sederhana, tapi abadi.</p>
+        </div>
+    </div>
+
+    <!-- Slideshow Modal -->
+    <div class="slideshow" id="slideshow">
+        <button class="close-slideshow" onclick="closeSlideshow()">Tutup</button>
+        <img id="slideshowImg" src="" alt="Slideshow">
+        <div class="caption" id="slideshowCaption"></div>
+    </div>
+
+    <script>
+        const validPasswords = ['nadin', 'rafa']; // Password: 'nadin' dan 'rafa'
+        const loginPrompt = document.getElementById('loginPrompt');
+        const mainContent = document.getElementById('mainContent');
+        const passwordInput = document.getElementById('passwordInput');
+        const errorMsg = document.getElementById('errorMsg');
+        const heartsContainer = document.getElementById('hearts');
+        const slideshow = document.getElementById('slideshow');
+        const slideshowImg = document.getElementById('slideshowImg');
+        const slideshowCaption = document.getElementById('slideshowCaption');
+        const timeline = document.getElementById('timeline');
+        let slideshowInterval;
+        let currentIndex = 0;
+        let photos = [];
+
+        // Pesan romantis harian (ganti sesuai mau)
+        const romanticMessages = [
+            "Setiap hari bersamamu adalah hari yang indah. Aku cinta kamu!",
+            "Kamu adalah cahaya dalam hidupku. Terima kasih sudah ada.",
+            "Momen kecil bersamamu adalah yang paling berharga.",
+            "Aku nggak bisa bayangin hidup tanpa kamu. Selamanya sayang.",
+            "Cintaku padamu seperti bintang, tak pernah padam."
+        ];
+
+        // Cek login saat load
+        window.onload = function() {
+            if (localStorage.getItem('loggedIn') === 'true') {
+                showMainContent();
+            }
+            startHeartFall(); // Efek hati jatuh
+            showRandomMessage(); // Pesan romantis random
+        };
+
+        function checkPassword() {
+            const password = passwordInput.value;
+            if (validPasswords.includes(password)) {
+                localStorage.setItem('loggedIn', 'true');
+                showMainContent();
+            } else {
+                errorMsg.style.display = 'block';
+                passwordInput.value = '';
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('loggedIn');
+            location.reload();
+        }
+
+        function showMainContent() {
+            loginPrompt.style.display = 'none';
+            mainContent.classList.remove('hidden');
+            loadContent();
+        }
+
+        function loadContent() {
+            // Load musik
+            const savedMusicLink = localStorage.getItem('musicLink');
+            if (savedMusicLink) {
+                document.getElementById('musicLink').value = savedMusicLink;
+                embedMusic(savedMusicLink);
+            }
+            // Load foto dengan caption
+            const savedPhotos = JSON.parse(localStorage.getItem('photos')) || [];
+            savedPhotos.forEach(item => addPhotoToGallery(item.src, item.caption));
+            photos = savedPhotos; // Untuk slideshow
+            // Load event kalender
+            const savedEvents = JSON.parse(localStorage.getItem('events')) || [];
+            savedEvents.forEach(event => addEventToTimeline(event.date, event.desc));
+        }
+
+        // Fungsi untuk embed musik
+        function embedMusic(link) {
+            const musicPlayer = document.getElementById('musicPlayer');
+            musicPlayer.innerHTML = '';
+            let embedCode = '';
+
+            if (link.includes('youtube.com') || link.includes('youtu.be')) {
+                const videoId = getYouTubeVideoId(link);
+                if (videoId) {
+                    embedCode = `<iframe width="100%" height="200" src="https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
+                } else {
+                    alert('Link YouTube tidak valid!');
+                    return;
+                }
+            } else if (link.includes('spotify.com')) {
+                const spotifyId = getSpotifyId(link);
+                if (spotifyId) {
+                    embedCode = `<iframe src="https://open.spotify.com/embed/${spotifyId}" width="100%" height="200" frameborder="0" allowtransparency="true" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>`;
+                } else {
+                    alert('Link Spotify tidak valid!');
+                    return;
+                }
+            } else {
+                alert('Hanya link YouTube atau Spotify yang didukung!');
+                return;
+            }
+
+            musicPlayer.innerHTML = embedCode;
+        }
+
+        // Fungsi untuk ekstrak YouTube video ID
+        function getYouTubeVideoId(url) {
+            const match = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
+            return match ? match[1] : null;
+        }
+
+        // Fung
